@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Store Bill Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="form-section">
+            <h1>Medical Store Bill Generator</h1>
+            
+            <div class="form-group">
+                <h2>Store Details</h2>
+                <div class="form-row">
+                    <div>
+                        <label for="storeName">Store Name:</label>
+                        <input type="text" id="storeName" value="MOOLCHAND MEDICAL STORES">
+                    </div>
+                    <div>
+                        <label for="storeAddress">Store Address:</label>
+                        <textarea id="storeAddress">PLOT NO. 2 SHOP NO. 3, NEW MARKET
+OPP APEX BANK T. T. NAGAR BHOPAL (M.P.)</textarea>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label for="storeSubtitle">Store Subtitle:</label>
+                        <input type="text" id="storeSubtitle" value="(Chemists & Druggists)">
+                    </div>
+                    <div>
+                        <label for="jurisdiction">Jurisdiction:</label>
+                        <input type="text" id="jurisdiction" value="Bhopal">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label for="dlNumber">D.L. Number:</label>
+                        <input type="text" id="dlNumber" value="21-98/84, 20-97/85">
+                    </div>
+                    <div>
+                        <label for="gstNumber">GST Number:</label>
+                        <input type="text" id="gstNumber">
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <div class="form-group">
+                <h2>Bill Details</h2>
+                <div class="form-row-3">
+                    <div>
+                        <label for="billNumber">Bill Number:</label>
+                        <input type="text" id="billNumber">
+                    </div>
+                    <div>
+                        <label for="billDate">Bill Date:</label>
+                        <input type="date" id="billDate" value="2025-08-21">
+                    </div>
+                    <div>
+                        <label for="billTime">Bill Time:</label>
+                        <input type="time" id="billTime" value="13:00">
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <div class="form-group">
+                <h2>Customer Details</h2>
+                <div class="form-row">
+                    <div>
+                        <label for="customerName">Customer Name:</label>
+                        <input type="text" id="customerName" value="DHAVAL SAXENA">
+                    </div>
+                    <div>
+                        <label for="customerAddress">Customer Address:</label>
+                        <textarea id="customerAddress"></textarea>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label for="prescribedBy">Prescribed By:</label>
+                        <input type="text" id="prescribedBy" value="ROHIT JAIN">
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <div class="form-group">
+                <h2>Medical Items</h2>
+                <div id="medicalItemsList" class="medical-items"></div>
+                <button class="btn btn-primary" onclick="addMedicalItem()">Add Item</button>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <div class="form-group">
+                <h2>Additional Details</h2>
+                <div class="form-row">
+                    <div>
+                        <label for="cashDiscount">Cash Discount:</label>
+                        <input type="number" id="cashDiscount" step="0.01" value="0">
+                    </div>
+                    <div>
+                        <label for="roundOff">Round Off:</label>
+                        <input type="number" id="roundOff" step="0.01" value="0" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-success" onclick="generateBill()">Update Bill</button>
+                <button class="btn btn-secondary" onclick="printBill()">Print Bill</button>
+            </div>
+
+            <div id="saveIndicator" class="save-indicator">✓ Bill Updated Successfully!</div>
+        </div>
+        <div class="preview-section">
+            <h2>Bill Preview</h2>
+            <div id="billPreviewContainer">
+                <div id="billPreview" class="bill-preview"></div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
