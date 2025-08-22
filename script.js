@@ -425,11 +425,25 @@ function generateBill() {
 // Print bill function
 function printBill() {
     const printContent = document.getElementById('billPreview').innerHTML;
+    const customerNameRaw = (document.getElementById('customerName').value || 'BILL').trim();
+    const billDate = (document.getElementById('billDate').value || '').trim();
+    const billTime = (document.getElementById('billTime').value || '').trim();
+    const sanitize = (s) => s
+        .replace(/\s+/g, '_')
+        .replace(/[^A-Za-z0-9._-]/g, '')
+        .replace(/_+/g, '_')
+        .substring(0, 80);
+    const namePart = sanitize(customerNameRaw) || 'BILL';
+    const datePart = sanitize(billDate || new Date().toISOString().split('T')[0]);
+    const timePart = sanitize((billTime || new Date().toTimeString().slice(0,5)).replace(':', '')); // HHMM
+    const fileBase = `${namePart}_${timePart}_${datePart}`;
+    const fileTitle = `${fileBase}`; // browsers typically append .pdf
+
     const printWindow = window.open('', '_blank');
     printWindow.document.write(`
       <html>
             <head>
-                <title>Bill</title>
+                <title>${fileTitle}</title>
                 <style>
                     body { 
                         font-family: 'Courier New', monospace; 
@@ -519,6 +533,10 @@ function printBill() {
             </head>
             <body>
                 <div class="bill-preview">${printContent}</div>
+                <script>
+                    document.title = ${JSON.stringify(fileTitle)};
+                    window.onload = function() { window.print(); window.onafterprint = window.close; };
+                <\/script>
             </body>
         </html>
     `);
