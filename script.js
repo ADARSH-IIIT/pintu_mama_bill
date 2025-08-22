@@ -18,6 +18,9 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('billDate').value = now.toISOString().split('T')[0];
     document.getElementById('billTime').value = now.toTimeString().split(' ')[0].substring(0, 5);
     
+    // Load store details from localStorage (or save current defaults if none)
+    loadStoreDetails();
+    
     // Initial render
     renderMedicalItems();
     
@@ -37,6 +40,36 @@ function addEventListeners() {
         input.addEventListener('input', debounce(updateBillPreview, 300));
         input.addEventListener('change', debounce(updateBillPreview, 300));
     });
+
+    // Persist store details when any of those fields change
+    const persistStoreDetailsDebounced = debounce(persistStoreDetails, 300);
+    if (typeof STORE_FIELDS !== 'undefined') {
+        STORE_FIELDS.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('input', persistStoreDetailsDebounced);
+                el.addEventListener('change', persistStoreDetailsDebounced);
+                el.addEventListener('blur', persistStoreDetailsDebounced);
+            }
+        });
+    }
+
+    // Force uppercase on Store Details fields only
+    if (typeof UPPERCASE_FIELDS !== 'undefined') {
+        UPPERCASE_FIELDS.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                const toUpper = () => {
+                    const pos = el.selectionStart;
+                    el.value = String(el.value).toUpperCase();
+                    try { el.setSelectionRange(pos, pos); } catch (_) {}
+                };
+                el.addEventListener('input', toUpper);
+                el.addEventListener('blur', toUpper);
+                el.addEventListener('change', toUpper);
+            }
+        });
+    }
 
     // Ctrl+S to save/update
     document.addEventListener('keydown', function(e) {
@@ -58,6 +91,44 @@ function debounce(func, wait) {
         clearTimeout(timeout);
         timeout = setTimeout(later, wait);
     };
+}
+
+// Local storage persistence for store details
+const STORE_FIELDS = ['storeName', 'storeAddress', 'storeSubtitle', 'jurisdiction', 'dlNumber', 'gstNumber'];
+// Only store detail fields should be uppercased
+const UPPERCASE_FIELDS = [...STORE_FIELDS];
+
+function loadStoreDetails() {
+    try {
+        const saved = localStorage.getItem('storeDetails');
+        if (saved) {
+            const data = JSON.parse(saved);
+            STORE_FIELDS.forEach(id => {
+                if (data && Object.prototype.hasOwnProperty.call(data, id)) {
+                    const el = document.getElementById(id);
+                    if (el) el.value = data[id];
+                }
+            });
+        } else {
+            // First visit: persist current defaults
+            persistStoreDetails();
+        }
+    } catch (e) {
+        console.warn('Failed to load store details from localStorage:', e);
+    }
+}
+
+function persistStoreDetails() {
+    try {
+        const data = {};
+        STORE_FIELDS.forEach(id => {
+            const el = document.getElementById(id);
+            data[id] = el ? el.value : '';
+        });
+        localStorage.setItem('storeDetails', JSON.stringify(data));
+    } catch (e) {
+        console.warn('Failed to save store details to localStorage:', e);
+    }
 }
 
 // Add new medical item
@@ -135,10 +206,12 @@ function handleInputChange(index, field, input) {
         const normalized = String(value).replace(',', '.');
         medicalItems[index][field] = parseFloat(normalized) || 0;
     } else {
+        // Do not force uppercase for item text fields
         medicalItems[index][field] = value;
+        input.value = value;
     }
     // Update the display value in the input without re-rendering
-    input.value = value;
+    // numeric fields already updated
 }
 
 // Update medical item data on blur
@@ -147,6 +220,7 @@ function updateMedicalItem(index, field, value) {
         const normalized = String(value).replace(',', '.');
         medicalItems[index][field] = parseFloat(normalized) || 0;
     } else {
+        // Keep item text as typed
         medicalItems[index][field] = value;
     }
     renderMedicalItems(); // Re-render only on blur
@@ -269,7 +343,7 @@ function updateBillPreview() {
             All Medicines subject to ${jurisdiction} Jurisdiction only<br>
             Price Inclusive of all taxes<br><br>
             <div style="text-align: right; margin-top: 20px;">
-                ISSUED TO :  ${document.getElementById('storeName').value}
+                ISSUED BY :  ${document.getElementById('storeName').value}
             </div>
         </div>
     `;
@@ -335,6 +409,8 @@ function numberToWords(num) {
 function saveBill() {
     const indicator = document.getElementById('saveIndicator');
     indicator.classList.add('show');
+    // Also persist store details on save
+    try { persistStoreDetails(); } catch (e) { /* noop */ }
     setTimeout(() => {
         indicator.classList.remove('show');
     }, 2000);

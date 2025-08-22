@@ -88,6 +88,7 @@ input[type="text"], input[type="date"], input[type="time"], input[type="number"]
     background: white;
 }
 
+
 input:focus, textarea:focus, select:focus {
     outline: none;
     border-color: #667eea;
