@@ -14,12 +14,9 @@ let medicalItems = [
 document.addEventListener('DOMContentLoaded', function() {
     // Set current date and time if not already set
     const now = new Date();
-    if (!document.getElementById('billDate').value) {
-        document.getElementById('billDate').value = now.toISOString().split('T')[0];
-    }
-    if (!document.getElementById('billTime').value) {
-        document.getElementById('billTime').value = now.toTimeString().split(' ')[0].substring(0, 5);
-    }
+    // Always set current date & time on load; user can edit after
+    document.getElementById('billDate').value = now.toISOString().split('T')[0];
+    document.getElementById('billTime').value = now.toTimeString().split(' ')[0].substring(0, 5);
     
     // Initial render
     renderMedicalItems();
@@ -119,9 +116,9 @@ function renderMedicalItems() {
                    oninput="handleInputChange(${index}, 'batchNo', this)" onblur="updateMedicalItem(${index}, 'batchNo', this.value)">
             <input type="text" value="${item.expiry}" placeholder="Expiry"
                    oninput="handleInputChange(${index}, 'expiry', this)" onblur="updateMedicalItem(${index}, 'expiry', this.value)">
-            <input type="number" value="${item.mrp}" step="0.01" placeholder="MRP"
+            <input type="text" value="${item.mrp}" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" placeholder="MRP"
                    oninput="handleInputChange(${index}, 'mrp', this)" onblur="updateMedicalItem(${index}, 'mrp', this.value)">
-            <input type="number" value="${item.discount}" step="0.01" placeholder="Disc %"
+            <input type="text" value="${item.discount}" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" placeholder="Disc %"
                    oninput="handleInputChange(${index}, 'discount', this)" onblur="updateMedicalItem(${index}, 'discount', this.value)" style="width: 100%;">
             <div class="item-amount">₹${itemTotal.toFixed(2)}</div>
             <button type="button" class="btn btn-danger" style="padding: 8px 12px; font-size: 11px;"
@@ -135,7 +132,8 @@ function renderMedicalItems() {
 function handleInputChange(index, field, input) {
     const value = input.value;
     if (field === 'qty' || field === 'mrp' || field === 'discount') {
-        medicalItems[index][field] = parseFloat(value) || 0;
+        const normalized = String(value).replace(',', '.');
+        medicalItems[index][field] = parseFloat(normalized) || 0;
     } else {
         medicalItems[index][field] = value;
     }
@@ -146,7 +144,8 @@ function handleInputChange(index, field, input) {
 // Update medical item data on blur
 function updateMedicalItem(index, field, value) {
     if (field === 'qty' || field === 'mrp' || field === 'discount') {
-        medicalItems[index][field] = parseFloat(value) || 0;
+        const normalized = String(value).replace(',', '.');
+        medicalItems[index][field] = parseFloat(normalized) || 0;
     } else {
         medicalItems[index][field] = value;
     }
