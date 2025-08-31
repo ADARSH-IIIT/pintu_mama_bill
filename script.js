@@ -543,3 +543,37 @@ function printBill() {
     printWindow.document.close();
     printWindow.print();
 }
+
+
+
+
+
+
+function downloadPDF() {
+    const element = document.getElementById('billPreview');
+
+    const customerNameRaw = (document.getElementById('customerName').value || 'BILL').trim();
+    const billDate = (document.getElementById('billDate').value || '').trim();
+    const billTime = (document.getElementById('billTime').value || '').trim();
+
+    const sanitize = (s) => s
+        .replace(/\s+/g, '_')
+        .replace(/[^A-Za-z0-9._-]/g, '')
+        .replace(/_+/g, '_')
+        .substring(0, 80);
+
+    const namePart = sanitize(customerNameRaw) || 'BILL';
+    const datePart = sanitize(billDate || new Date().toISOString().split('T')[0]);
+    const timePart = sanitize((billTime || new Date().toTimeString().slice(0,5)).replace(':', '')); // HHMM
+    const fileBase = `${namePart}_${timePart}_${datePart}`;
+
+    const opt = {
+        margin:       0.5,
+        filename:     fileBase + ".pdf",
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save();
+}

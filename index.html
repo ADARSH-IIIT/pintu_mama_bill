@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Medical Store Bill Generator</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
 </head>
 <body>
     <div class="container">
@@ -115,9 +117,14 @@ OPP APEX BANK T. T. NAGAR BHOPAL (M.P.)</textarea>
             <div class="button-group">
                 <button class="btn btn-success" onclick="generateBill()">Update Bill</button>
                 <button class="btn btn-secondary" onclick="printBill()">Print Bill</button>
+                <button class="btn btn-primary" onclick="downloadPDF()">Download PDF</button>
             </div>
 
+            
+
             <div id="saveIndicator" class="save-indicator">✓ Bill Updated Successfully!</div>
+
+            
         </div>
         <div class="preview-section">
             <h2>Bill Preview</h2>
